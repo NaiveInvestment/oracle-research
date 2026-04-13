@@ -3,540 +3,364 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 인프라 스펙 비교</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>AI IaaS 인프라 비교</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #ffffff;
-    --surface: #f8f9fb;
-    --surface-hover: #f0f1f5;
-    --border: #e2e4ea;
-    --text: #1a1d27;
-    --text-muted: #6b7085;
-    --accent-oracle: #c74634;
-    --accent-oracle-bg: rgba(199, 70, 52, 0.05);
-    --accent-aws: #e68a00;
-    --accent-azure: #0066b8;
-    --accent-gcp: #3574d4;
-    --accent-coreweave: #00a885;
-    --highlight: #b8860b;
-    --positive: #16875d;
-    --negative: #c0392b;
-    --neutral: #6b7085;
-  }
+:root {
+  --bg: #ffffff;
+  --surface: #fafafa;
+  --surface2: #f3f4f6;
+  --border: #e2e4e8;
+  --border-accent: #a0c4f0;
+  --text: #2d2d3a;
+  --text-dim: #6b7280;
+  --text-bright: #111118;
+  --accent: #2563eb;
+  --accent-soft: rgba(37,99,235,0.04);
+  --accent-border: rgba(37,99,235,0.2);
+  --green: #16a34a;
+  --red: #dc2626;
+  --orange: #d97706;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin:0; padding:0; box-sizing:border-box; }
 
-  body {
-    font-family: 'Noto Sans KR', -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 40px 32px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  line-height: 1.6;
+  padding: 40px 24px;
+  min-height: 100vh;
+}
 
-  .header {
-    margin-bottom: 32px;
-  }
+.container { max-width: 1200px; margin: 0 auto; }
+.header { margin-bottom: 32px; }
 
-  .header h1 {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
-  }
+.header .tag {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  padding: 3px 12px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
 
-  .header .subtitle {
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
+.header h1 {
+  font-family: 'Source Serif 4', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+}
 
-  .header .subtitle span {
-    color: var(--highlight);
-    font-weight: 500;
-  }
+.header p {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+.header a { color: var(--accent); text-decoration: underline; }
 
-  .table-container {
-    overflow-x: auto;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-  }
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
 
-  table {
-    width: 100%;
-    min-width: 900px;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
+table { width: 100%; border-collapse: collapse; min-width: 920px; }
 
-  thead th {
-    padding: 16px 14px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: -0.2px;
-    border-bottom: 2px solid var(--border);
-    background: var(--surface);
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
+thead tr:first-child th {
+  padding: 20px 16px 6px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-bright);
+  border-bottom: none;
+  background: var(--bg);
+}
+thead tr:first-child th:first-child { text-align: left; }
 
-  thead th:first-child {
-    text-align: left;
-    width: 160px;
-    padding-left: 20px;
-    color: var(--text-muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
+thead tr:nth-child(2) th {
+  padding: 0 16px 16px;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+thead tr:nth-child(2) th:first-child { text-align: left; }
 
-  thead th .provider-name {
-    display: block;
-    font-size: 14px;
-  }
+.type-hyper { color: var(--text-dim); }
+.type-oracle { color: var(--accent); }
+.type-neo { color: var(--orange); }
 
-  thead th .provider-tag {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-top: 4px;
-    letter-spacing: 0;
-  }
+.section-row td {
+  padding: 14px 16px 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
 
-  .tag-hyper { background: rgba(99, 102, 241, 0.1); color: #4f46e5; }
-  .tag-oracle { background: rgba(199, 70, 52, 0.08); color: #c74634; }
-  .tag-neo { background: rgba(0, 168, 133, 0.08); color: #00806a; }
+tbody td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  text-align: center;
+  font-weight: 300;
+}
+tbody td:first-child {
+  text-align: left;
+  font-weight: 400;
+  color: var(--text-dim);
+  font-size: 13px;
+  min-width: 140px;
+}
+tbody tr:last-child td { border-bottom: none; }
 
-  th.col-aws { border-bottom-color: var(--accent-aws); }
-  th.col-azure { border-bottom-color: var(--accent-azure); }
-  th.col-gcp { border-bottom-color: var(--accent-gcp); }
-  th.col-oracle { border-bottom-color: var(--accent-oracle); }
-  th.col-coreweave { border-bottom-color: var(--accent-coreweave); }
+/* ORACLE COL */
+thead tr:first-child th:nth-child(5),
+thead tr:nth-child(2) th:nth-child(5),
+tbody td:nth-child(5),
+.section-row td:nth-child(5) {
+  background: var(--accent-soft);
+  border-left: 1px solid var(--accent-border);
+  border-right: 1px solid var(--accent-border);
+}
+thead tr:first-child th:nth-child(5) {
+  border-top: 1px solid var(--accent-border);
+  border-radius: 8px 8px 0 0;
+  background: rgba(37,99,235,0.06);
+}
+tbody tr:last-child td:nth-child(5) {
+  border-bottom: 1px solid var(--accent-border);
+}
+.section-row td:nth-child(5) { background: rgba(37,99,235,0.04); }
 
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-  }
+.chip {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.chip-vm { background: #f1f1f5; color: var(--text-dim); }
+.chip-bm { background: rgba(37,99,235,0.1); color: var(--accent); }
+.chip-both { background: rgba(217,119,6,0.08); color: var(--orange); }
+.chip-platinum { background: rgba(217,119,6,0.15); color: #92400e; border: 1px solid rgba(217,119,6,0.3); }
+.chip-gold { background: rgba(217,119,6,0.08); color: var(--orange); }
+.chip-silver { background: #f1f1f5; color: #6b7280; }
 
-  tbody tr:hover {
-    background: var(--surface-hover);
-  }
+.price {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.price-note {
+  display: block;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 400;
+  margin-top: 2px;
+}
+.gpu-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.sub {
+  display: block;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 400;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.highlight-val { color: var(--accent); }
 
-  tbody tr:last-child {
-    border-bottom: none;
-  }
+/* TCO BAR */
+.tco-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.tco-bar-outer {
+  width: 80px; height: 7px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.tco-bar-fill { height:100%; border-radius:4px; }
+.tco-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
 
-  tbody td {
-    padding: 14px 14px;
-    text-align: center;
-    vertical-align: top;
-    line-height: 1.5;
-  }
+.footnote {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.footnote p {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  font-weight: 300;
+}
+.footnote p + p { margin-top: 6px; }
+.footnote strong { color: var(--text); font-weight: 500; }
 
-  tbody td:first-child {
-    text-align: left;
-    padding-left: 20px;
-    font-weight: 600;
-    color: var(--text);
-    font-size: 13px;
-  }
-
-  .row-label-sub {
-    display: block;
-    font-weight: 400;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 2px;
-  }
-
-  .val-main {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 2px;
-  }
-
-  .val-sub {
-    display: block;
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  .val-positive { color: var(--positive); }
-  .val-negative { color: var(--negative); }
-  .val-highlight { color: var(--highlight); }
-  .val-neutral { color: var(--text-muted); }
-
-  .badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-
-  .badge-platinum { background: rgba(109, 40, 217, 0.1); color: #6d28d9; }
-  .badge-gold { background: rgba(180, 130, 0, 0.1); color: #92700a; }
-  .badge-silver { background: rgba(107, 112, 133, 0.1); color: #4a4e5a; }
-  .badge-bare { background: rgba(5, 150, 105, 0.08); color: #047857; }
-  .badge-vm { background: rgba(220, 38, 38, 0.07); color: #b91c1c; }
-  .badge-both { background: rgba(79, 70, 229, 0.08); color: #4338ca; }
-  .badge-na { background: rgba(107, 112, 133, 0.08); color: #6b7085; }
-
-  .chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    justify-content: center;
-  }
-
-  .chip {
-    display: inline-block;
-    padding: 2px 7px;
-    border-radius: 3px;
-    font-size: 10px;
-    font-weight: 500;
-    background: rgba(0,0,0,0.04);
-    color: var(--text-muted);
-  }
-
-  .chip-nvidia { background: rgba(75, 140, 0, 0.08); color: #3d7a00; }
-  .chip-custom { background: rgba(79, 70, 229, 0.08); color: #4338ca; }
-  .chip-amd { background: rgba(220, 38, 36, 0.07); color: #b91c1c; }
-
-  /* Oracle column subtle highlight */
-  td:nth-child(5), th:nth-child(5) {
-    background: var(--accent-oracle-bg);
-  }
-
-  tbody tr:hover td:nth-child(5) {
-    background: rgba(199, 70, 52, 0.12);
-  }
-
-  .footnotes {
-    margin-top: 20px;
-    padding: 16px 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 11px;
-    color: var(--text-muted);
-    line-height: 1.7;
-  }
-
-  .footnotes strong {
-    color: var(--text);
-    font-weight: 600;
-  }
-
-  .footnotes .src {
-    color: var(--highlight);
-    font-size: 10px;
-    vertical-align: super;
-    margin-left: 1px;
-  }
+@media (max-width: 768px) {
+  body { padding: 20px 12px; }
+  .header h1 { font-size: 22px; }
+}
 </style>
 </head>
 <body>
+<div class="container">
 
 <div class="header">
-  <h1>AI 인프라 스펙 비교</h1>
-  <div class="subtitle">H100 80GB 기준 on-demand 가격 비교 · <span>Oracle</span> 열 하이라이트 · 2025년 하반기 기준</div>
+  <div class="tag">Infra Comparison</div>
+  <h1>AI IaaS 인프라 스펙 비교</h1>
+  <p>H100 80GB · 8×GPU 노드 기준 · 2025년 하반기 기준<br>칩 전략·자체 모델·투자 현황은 <a href="https://naiveinvestment.github.io/hyperscaler/">Hyperscaler AI Strategy</a> 참조</p>
 </div>
 
-<div class="table-container">
+<div class="table-wrap">
 <table>
-  <thead>
-    <tr>
-      <th>비교 항목</th>
-      <th class="col-aws">
-        <span class="provider-name">AWS</span>
-        <span class="provider-tag tag-hyper">Hyperscaler</span>
-      </th>
-      <th class="col-azure">
-        <span class="provider-name">Azure</span>
-        <span class="provider-tag tag-hyper">Hyperscaler</span>
-      </th>
-      <th class="col-gcp">
-        <span class="provider-name">GCP</span>
-        <span class="provider-tag tag-hyper">Hyperscaler</span>
-      </th>
-      <th class="col-oracle">
-        <span class="provider-name">Oracle OCI</span>
-        <span class="provider-tag tag-oracle">NeoCloud/CSP</span>
-      </th>
-      <th class="col-coreweave">
-        <span class="provider-name">CoreWeave</span>
-        <span class="provider-tag tag-neo">NeoCloud</span>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
+<thead>
+  <tr>
+    <th></th>
+    <th>AWS</th>
+    <th>Azure</th>
+    <th>GCP</th>
+    <th>Oracle OCI</th>
+    <th>CoreWeave</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th class="type-hyper">Hyperscaler</th>
+    <th class="type-hyper">Hyperscaler</th>
+    <th class="type-hyper">Hyperscaler</th>
+    <th class="type-oracle">NeoCloud / CSP</th>
+    <th class="type-neo">NeoCloud</th>
+  </tr>
+</thead>
+<tbody>
 
-    <!-- 1. 제공 방식 -->
-    <tr>
-      <td>
-        제공 방식
-        <span class="row-label-sub">Baremetal / VM</span>
-      </td>
-      <td>
-        <span class="badge badge-vm">VM</span>
-        <span class="val-sub">P5.48xlarge (8×H100)</span>
-      </td>
-      <td>
-        <span class="badge badge-vm">VM</span>
-        <span class="val-sub">ND H100 v5 (8×H100)</span>
-      </td>
-      <td>
-        <span class="badge badge-vm">VM</span>
-        <span class="val-sub">A3 Mega / High (8×H100)</span>
-      </td>
-      <td>
-        <span class="badge badge-bare">Baremetal</span>
-        <span class="val-sub">BM.GPU.H100.8 (8×H100)</span>
-      </td>
-      <td>
-        <span class="badge badge-both">Both</span>
-        <span class="val-sub">HGX H100 (8×H100)</span>
-      </td>
-    </tr>
+  <!-- 인프라 구조 -->
+  <tr class="section-row"><td colspan="6">인프라 구조</td></tr>
+  <tr>
+    <td>제공 방식</td>
+    <td><span class="chip chip-vm">VM</span><span class="sub">P5.48xlarge (8×H100)</span></td>
+    <td><span class="chip chip-vm">VM</span><span class="sub">ND H100 v5 (8×H100)</span></td>
+    <td><span class="chip chip-vm">VM</span><span class="sub">A3 Mega/High (8×H100)</span></td>
+    <td><span class="chip chip-bm">Baremetal</span><span class="sub">BM.GPU.H100.8 (8×H100)<br>Off-box · 오버헤드 0%</span></td>
+    <td><span class="chip chip-both">Both</span><span class="sub">HGX H100 (8×H100)</span></td>
+  </tr>
+  <tr>
+    <td>인터커넥트</td>
+    <td>EFA<span class="sub">Elastic Fabric Adapter<br>3,200 Gbps / 노드</span></td>
+    <td>InfiniBand<span class="sub">NDR 400G<br>3,200 Gbps / VM</span></td>
+    <td>GPUDirect<span class="sub">NVSwitch + NVLink 4.0<br>3.6 TB/s (노드 내)</span></td>
+    <td><span class="highlight-val">RoCEv2 RDMA</span><span class="sub"><strong>전용 네트워크</strong> 별도 구축<br>NVIDIA ConnectX NIC<br>GB200~ InfiniBand 전환</span></td>
+    <td>InfiniBand<span class="sub">NDR Non-blocking<br>fat-tree 토폴로지</span></td>
+  </tr>
+  <tr>
+    <td>최대 클러스터<br>GPU 수</td>
+    <td><span class="gpu-num">20,000</span><span class="sub">H100/H200<br>EC2 UltraCluster</span></td>
+    <td><span class="gpu-num">수천 대</span><span class="sub">H100<br>공식 상한 미공개</span></td>
+    <td><span class="gpu-num">26,000</span><span class="sub">H100<br>A3 Supercomputer</span></td>
+    <td><span class="gpu-num highlight-val">131,072</span><span class="sub">B200 · OCI Supercluster<br>H200: 65,536 / H100: 16,384</span></td>
+    <td><span class="gpu-num">250,000+</span><span class="sub">총 GPU 보유량 (S-1)<br>단일 클러스터 상한 미공개</span></td>
+  </tr>
 
-    <!-- 2. GPU 인스턴스 가격 -->
-    <tr>
-      <td>
-        GPU 가격
-        <span class="row-label-sub">H100 on-demand $/GPU/hr</span>
-      </td>
-      <td>
-        <span class="val-main">~$3.90</span>
-        <span class="val-sub">25년 6월 44% 인하 후</span>
-        <span class="val-sub">8×GPU 노드 기준</span>
-      </td>
-      <td>
-        <span class="val-main val-negative">~$12.29</span>
-        <span class="val-sub">$98.32/hr ÷ 8 GPU</span>
-        <span class="val-sub">ND96isr 8×GPU 노드 기준</span>
-      </td>
-      <td>
-        <span class="val-main">~$3.00</span>
-        <span class="val-sub">A3 High 기준</span>
-        <span class="val-sub">8×GPU 노드 기준</span>
-      </td>
-      <td>
-        <span class="val-main val-highlight">$10.00</span>
-        <span class="val-sub">$80/hr ÷ 8 GPU</span>
-        <span class="val-sub">Baremetal · 가상화 오버헤드 0%</span>
-      </td>
-      <td>
-        <span class="val-main">~$6.15</span>
-        <span class="val-sub">HGX 8×GPU 노드 기준</span>
-      </td>
-    </tr>
+  <!-- 가격 -->
+  <tr class="section-row"><td colspan="6">가격 (H100 On-demand)</td></tr>
+  <tr>
+    <td>H100 단가<br><span style="font-size:10px">$/GPU/hr</span></td>
+    <td><span class="price">~$3.90</span><span class="price-note"><strong>VM</strong> 기준<br>25.6 44% 인하 후</span></td>
+    <td><span class="price">~$12.29</span><span class="price-note"><strong>VM</strong> · ND96isr<br>IB 포함 · $98.32÷8</span></td>
+    <td><span class="price">~$3.00</span><span class="price-note"><strong>VM</strong> 기준<br>A3 High</span></td>
+    <td><span class="price highlight-val">$10.00</span><span class="price-note"><strong>Baremetal</strong><br>$80÷8 · 오버헤드 0%<br>NVMe 61.4TB 포함</span></td>
+    <td><span class="price">~$6.15</span><span class="price-note">HGX H100<br>8×GPU 노드</span></td>
+  </tr>
+  <tr>
+    <td>TCO 기준<br>Price-Performance<br><span style="font-size:10px">대규모 AI 학습<br>벤치마크 기준</span></td>
+    <td>
+      <div class="tco-wrap">
+        <div class="tco-bar-outer"><div class="tco-bar-fill" style="width:58%;background:var(--text-dim)"></div></div>
+        <span class="tco-label" style="color:var(--text-dim)">기준선</span>
+      </div>
+      <span class="sub">VM 오버헤드 5~10%<br>Egress $0.09/GB</span>
+    </td>
+    <td>
+      <div class="tco-wrap">
+        <div class="tco-bar-outer"><div class="tco-bar-fill" style="width:62%;background:var(--text-dim)"></div></div>
+        <span class="tco-label" style="color:var(--text-dim)">기준선</span>
+      </div>
+      <span class="sub">VM 오버헤드 5~10%<br>Egress $0.087/GB</span>
+    </td>
+    <td>
+      <div class="tco-wrap">
+        <div class="tco-bar-outer"><div class="tco-bar-fill" style="width:58%;background:var(--text-dim)"></div></div>
+        <span class="tco-label" style="color:var(--text-dim)">기준선</span>
+      </div>
+      <span class="sub">VM 오버헤드 5~10%</span>
+    </td>
+    <td>
+      <div class="tco-wrap">
+        <div class="tco-bar-outer"><div class="tco-bar-fill" style="width:95%;background:var(--accent)"></div></div>
+        <span class="tco-label highlight-val">38~44%↑</span>
+      </div>
+      <span class="sub">Baremetal · GPU 100%<br>Egress 10TB 무료<br>이후 $0.0085/GB</span>
+    </td>
+    <td>
+      <div class="tco-wrap">
+        <div class="tco-bar-outer"><div class="tco-bar-fill" style="width:78%;background:var(--orange)"></div></div>
+        <span class="tco-label" style="color:var(--orange)">MFU 50%+</span>
+      </div>
+      <span class="sub">하이퍼스케일러 대비<br>~20% 높음</span>
+    </td>
+  </tr>
 
-    <!-- 2-1. 실효 Price-Performance -->
-    <tr>
-      <td>
-        실효 Price-Performance
-        <span class="row-label-sub">벤치마크 기준 상대 평가</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">기준선</span>
-        <span class="val-sub">VM · 가상화 오버헤드 5~10%</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">기준선</span>
-        <span class="val-sub">VM · 가상화 오버헤드 5~10%</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">기준선</span>
-        <span class="val-sub">VM · 가상화 오버헤드 5~10%</span>
-      </td>
-      <td>
-        <span class="val-main val-positive" style="font-size:12px;">38~44% 우위</span>
-        <span class="val-sub">Baremetal · GPU 100% 활용</span>
-        <span class="val-sub">Egress 비용 1/10 수준</span>
-      </td>
-      <td>
-        <span class="val-main val-positive" style="font-size:12px;">MFU 50%+</span>
-        <span class="val-sub">하이퍼스케일러 대비 ~20% 높음</span>
-      </td>
-    </tr>
+  <!-- 종합 평가 -->
+  <tr class="section-row"><td colspan="6">종합 평가</td></tr>
+  <tr>
+    <td>ClusterMAX™<br><span style="font-size:10px">SemiAnalysis v2.0<br>(2025.11)</span></td>
+    <td><span class="chip chip-silver">Silver</span><span class="sub">EFA 네트워킹이<br>주요 감점 요인</span></td>
+    <td><span class="chip chip-gold">Gold</span></td>
+    <td><span class="chip chip-silver">Silver</span><span class="sub">v1.0 Bronze에서<br>빠르게 상승 중</span></td>
+    <td><span class="chip chip-gold">Gold</span><span class="sub">Gold 내 최상위권<br>네트워킹 강점</span></td>
+    <td><span class="chip chip-platinum">Platinum</span><span class="sub">유일한 Platinum<br>(2년 연속)</span></td>
+  </tr>
 
-    <!-- 3. 최대 클러스터 규모 -->
-    <tr>
-      <td>
-        최대 클러스터 규모
-        <span class="row-label-sub">공식 발표 기준</span>
-      </td>
-      <td>
-        <span class="val-main">20,000</span>
-        <span class="val-sub">H100/H200 · EC2 UltraCluster</span>
-      </td>
-      <td>
-        <span class="val-main">수천 대</span>
-        <span class="val-sub">H100 · 공식 상한 미공개</span>
-      </td>
-      <td>
-        <span class="val-main">26,000</span>
-        <span class="val-sub">H100 · A3 Supercomputer</span>
-      </td>
-      <td>
-        <span class="val-main val-highlight">131,072</span>
-        <span class="val-sub">B200 · OCI Supercluster</span>
-        <span class="val-sub">H200: 65,536 / H100: 16,384</span>
-      </td>
-      <td>
-        <span class="val-main">250,000+</span>
-        <span class="val-sub">총 GPU 보유량 (S-1 기준)</span>
-        <span class="val-sub">단일 클러스터 상한 미공개</span>
-      </td>
-    </tr>
-
-    <!-- 4. 인터커넥트 -->
-    <tr>
-      <td>
-        인터커넥트
-        <span class="row-label-sub">GPU 간 통신</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">EFA + GPUDirect RDMA</span>
-        <span class="val-sub">3,200 Gbps / 노드</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">InfiniBand NDR 400G</span>
-        <span class="val-sub">3,200 Gbps / VM</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">NVSwitch + NVLink 4.0</span>
-        <span class="val-sub">3.6 TB/s 양방향 (노드 내)</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">RoCE v2 RDMA</span>
-        <span class="val-sub">NVIDIA ConnectX NIC</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">InfiniBand NDR</span>
-        <span class="val-sub">Non-blocking fat-tree</span>
-      </td>
-    </tr>
-
-    <!-- 5. 스토리지 -->
-    <tr>
-      <td>
-        스토리지
-        <span class="row-label-sub">로컬 NVMe / 파일시스템</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">NVMe SSD</span>
-        <span class="val-sub">FSx for Lustre</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">NVMe SSD</span>
-        <span class="val-sub">Managed Lustre</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">Local SSD</span>
-        <span class="val-sub">Cloud Filestore</span>
-      </td>
-      <td>
-        <span class="val-main val-positive" style="font-size:12px;">최대 61.44 TB NVMe</span>
-        <span class="val-sub">Lustre + BeeGFS + WEKA</span>
-      </td>
-      <td>
-        <span class="val-main" style="font-size:12px;">NVMe SSD</span>
-        <span class="val-sub">자체 고성능 스토리지</span>
-      </td>
-    </tr>
-
-    <!-- 6. 지원 GPU / 자체 칩 -->
-    <tr>
-      <td>
-        지원 GPU / 자체 칩
-      </td>
-      <td>
-        <div class="chip-row">
-          <span class="chip chip-nvidia">NVIDIA H100/B200</span>
-          <span class="chip chip-custom">Trainium</span>
-          <span class="chip chip-custom">Inferentia</span>
-        </div>
-      </td>
-      <td>
-        <div class="chip-row">
-          <span class="chip chip-nvidia">NVIDIA H100/B200</span>
-          <span class="chip chip-amd">AMD MI300X</span>
-          <span class="chip chip-custom">Maia 100</span>
-        </div>
-      </td>
-      <td>
-        <div class="chip-row">
-          <span class="chip chip-nvidia">NVIDIA H100/B200</span>
-          <span class="chip chip-custom">TPU v5p/v6e</span>
-        </div>
-      </td>
-      <td>
-        <div class="chip-row">
-          <span class="chip chip-nvidia">NVIDIA H100/H200</span>
-          <span class="chip chip-nvidia">B200/GB200</span>
-          <span class="chip chip-amd">AMD MI300X</span>
-        </div>
-        <span class="val-sub">자체 칩 없음 · NVIDIA 올인</span>
-      </td>
-      <td>
-        <div class="chip-row">
-          <span class="chip chip-nvidia">NVIDIA H100/H200</span>
-          <span class="chip chip-nvidia">B200/GB200</span>
-        </div>
-        <span class="val-sub">자체 칩 없음 · NVIDIA 올인</span>
-      </td>
-    </tr>
-
-    <!-- 7. ClusterMAX 등급 -->
-    <tr>
-      <td>
-        ClusterMAX™ 등급
-        <span class="row-label-sub">SemiAnalysis 2.0 (2025.11)</span>
-      </td>
-      <td>
-        <span class="badge badge-silver">SILVER</span>
-      </td>
-      <td>
-        <span class="badge badge-gold">GOLD</span>
-      </td>
-      <td>
-        <span class="badge badge-silver">SILVER</span>
-      </td>
-      <td>
-        <span class="badge badge-gold">GOLD</span>
-      </td>
-      <td>
-        <span class="badge badge-platinum">PLATINUM</span>
-        <span class="val-sub">유일한 Platinum</span>
-      </td>
-    </tr>
-
-  </tbody>
+</tbody>
 </table>
 </div>
 
-<div class="footnotes">
-  <strong>출처 및 참고</strong><br>
-  • GPU 가격: AWS — 25년 6월 인하 후 P5.48xlarge 기준<span class="src">[1]</span> · Azure — ND96isr H100 v5 US East 기준<span class="src">[2]</span> · GCP — A3 High on-demand 기준<span class="src">[3]</span> · Oracle — 공식 가격표 BM.GPU.H100.8 기준<span class="src">[4]</span> · CoreWeave — HGX H100 노드 기준<span class="src">[5]</span><br>
-  • 클러스터 규모: AWS EC2 P5 UltraCluster<span class="src">[6]</span> · GCP A3 Supercomputer<span class="src">[7]</span> · Oracle OCI Supercluster — B200 131,072 / H200 65,536 / H100 16,384<span class="src">[8]</span> · CoreWeave 총 보유량 ~250,000 (S-1 기준)<span class="src">[9]</span><br>
-  • 스토리지: Oracle — 로컬 NVMe 최대 61.44 TB, 주요 클라우드 중 최대 용량<span class="src">[8]</span><br>
-  • Price-Performance: Oracle — AI 학습 워크로드 기준 AWS·Azure 대비 38~44% 우위<span class="src">[11]</span> · CoreWeave — MFU 50%+ 달성, 타사 대비 ~20% 높음<span class="src">[12]</span><br>
-  • ClusterMAX™ 2.0은 Security, Lifecycle, Orchestration, Storage, Networking, Reliability, Monitoring, Pricing, Partnerships, Availability 10개 항목을 종합 평가한 등급<span class="src">[10]</span><br>
-  <br>
-  <strong>⚠ 가격 주의사항</strong>: Oracle의 $10/GPU/hr은 Baremetal이므로 VM 기반 하이퍼스케일러 가격과 단순 비교 시 주의 필요. Baremetal은 가상화 오버헤드 없이 GPU 성능 100% 활용 가능하므로, 실효 가격 대비 성능(price-performance)은 벤치마크 기준 38~44% 우위로 보고됨<span class="src">[11]</span>. Egress 비용은 OCI가 하이퍼스케일러 대비 최대 1/10 수준<span class="src">[8]</span>.
+<div class="footnote">
+  <p><strong>⚠ 가격 해석 시 유의사항:</strong> H100 단가 행은 각사의 대표 인스턴스 온디맨드 리스트 가격이며, 제공 방식(VM vs Baremetal)이 다르므로 단순 비교 불가. Oracle $10/GPU/hr은 Baremetal(오버헤드 0%) + NVMe 61.4TB + Egress 10TB 무료가 포함된 가격이고, AWS·GCP $3~4는 VM 기준(오버헤드 5~10%). 동일 스펙(Baremetal + InfiniBand) 비교 시 Azure ND96isr $12.29 vs Oracle $10.00으로 Oracle이 약 19% 저렴.</p>
+  <p><strong>TCO(총소유비용) 기준:</strong> 대규모 AI 학습 워크로드(8×GPU + 스토리지 + Egress 포함) 벤치마크에서 Oracle이 AWS 대비 38%, Azure 대비 32% 저렴. Oracle의 Egress 비용은 하이퍼스케일러의 약 1/10 수준(10TB 무료 후 $0.0085/GB vs AWS $0.09/GB)이며, 블록 스토리지도 AWS 대비 68%, Azure 대비 79% 저렴.</p>
+  <p><strong>ClusterMAX™:</strong> SemiAnalysis가 Security, Networking, Storage, Orchestration, Reliability 등 10개 항목을 종합 평가한 GPU 클라우드 등급(5단계). v2.0(2025.11) 기준 37개 클라우드 평가. Platinum은 CoreWeave가 유일.</p>
+  <p><strong>출처:</strong> 각사 공시·가격 페이지(2025 H2) · SemiAnalysis ClusterMAX v2.0(2025.11) · Oracle AI World(2025.10) · CoreWeave S-1 Filing. 가격은 리전·계약 조건에 따라 상이할 수 있음.</p>
 </div>
 
+</div>
 </body>
 </html>
